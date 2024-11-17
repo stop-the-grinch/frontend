@@ -15,7 +15,7 @@ const sourceCodePro = Source_Code_Pro({
 
 export const metadata = {
     title: "Stop the Grinch!",
-    description: "Save christmas by stopping the grinch from stealing presents!",
+    description: "Save Christmas by stopping the Grinch!",
 };
 
 export default function RootLayout({ children }) {
@@ -28,11 +28,9 @@ export default function RootLayout({ children }) {
                     enableSystem
                 >
                     <PageWrapper>
-
-
                         {children}
-
                     </PageWrapper>
+
                 </ThemeProvider>
                 <Toaster />
             </body>

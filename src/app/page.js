@@ -10,6 +10,8 @@ import Image from "next/image";
 import JoinView from "./views/join";
 import NameView from "./views/name";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
+import axios from "axios";
+import GameView from "./views/game";
 
 export default function Home() {
 
@@ -36,7 +38,9 @@ export default function Home() {
 
     useEffect(() => {
         if (lastMessage !== null) {
-            console.log(lastMessage)
+            const message = JSON.parse(lastMessage.data)
+            console.log(message)
+            setGameState(message)
         }
     }, [lastMessage]);
 
@@ -48,16 +52,21 @@ export default function Home() {
         [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
     }[readyState];
 
+
+
     useEffect(() => {
-        const cachedUser = localStorage.getItem("gameUser")
-        if (cachedUser !== null) {
-            setUser(JSON.parse(cachedUser))
-            setView(2)
+        if (gameState) {
+            setView(3)
         } else {
-            setView(1)
+            const cachedUser = localStorage.getItem("gameUser")
+            if (cachedUser !== null) {
+                setUser(JSON.parse(cachedUser))
+                setView(2)
+            } else {
+                setView(1)
+            }
         }
-    },
-        [])
+    }, [gameState]);
 
     return (
         <div className="relative w-full h-full flex justify-center items-center">
@@ -75,23 +84,62 @@ export default function Home() {
                             setView(2)
                             toast({
                                 duration: 2000,
-                                title: `Created user ${name}`,
+                                title: `Joined as ${name}!`,
                             })
                         }}
                     />
                 ),
                 (
-                    <JoinView joinGame=
+                    <JoinView
+                        joinGame=
                         {
-                            (gameCode) => {
-                                sendMessage(JSON.stringify({ type: "join", data: { code: gameCode } }))
-                                setView(3)
+                            async (gameCode) => {
+                                const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/join-game/${user.id}/${gameCode}`).catch(e => {
+                                    console.log(e)
+                                    toast({
+                                        duration: 5000,
+                                        variant: "destructive",
+                                        title: "Error Joining Game",
+                                        description: e?.response?.data?.detail
+                                    })
+                                })
                             }
-                        } />
+                        }
+                        createGame=
+                        {
+
+
+                            async () => {
+                                console.log(`${process.env.NEXT_PUBLIC_API_URL}/api/create-game/${user.id}`)
+                                const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/create-game/${user.id}`).catch(e => {
+                                    console.log(e)
+                                    toast({
+                                        duration: 5000,
+                                        variant: "destructive",
+                                        title: "Error Creating Game",
+                                        description: e?.response?.data?.detail
+                                    })
+                                })
+                            }
+                        }
+                    />
                 ),
+                (
+                    <GameView
+                        user={user}
+                        gameState={gameState}
+                        sendMessage={sendMessage}
+                    />
+                )
 
             ][view]
             }
+
+            <div className="absolute bottom-2 left-2">
+                <p>
+                    {connectionStatus}
+                </p>
+            </div>
         </div >
 
     );

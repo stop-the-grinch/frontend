@@ -7,7 +7,7 @@ export default function Header() {
     const { theme, setTheme } = useTheme()
 
     return (
-        <div className="h-16 w-full flex justify-center items-center">
+        <div className="absolute top-0 left-0 h-16 w-full flex justify-center items-center z-20">
             <div className="flex justify-between max-w-7xl w-full">
                 <div className="flex gap-2 items-center">
                     <Snowflake size={32} />

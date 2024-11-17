@@ -20,7 +20,7 @@ export default function NameView({ setUser }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Enter your name!</CardTitle>
+                <CardTitle className="w-full text-center">Enter your name!</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
                 <Input
